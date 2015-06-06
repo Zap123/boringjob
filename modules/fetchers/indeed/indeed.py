@@ -33,7 +33,7 @@ class IndeedFetcher:
         print(self.query)
         r = requests.get(self.url, params=self.query)
         print(r.url)
-        self.sendToMail(self.results(json.loads(r.content)), 
+        self.sendToMail(self.results(json.loads(r.content.decode('utf-8'))), 
                 "JOB OPPORTUNITIES " + time.strftime("%d/%m/%Y"))
     
     def results(self, dict_json):

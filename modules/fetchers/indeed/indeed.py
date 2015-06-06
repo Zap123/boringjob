@@ -63,6 +63,7 @@ class IndeedFetcher:
         smtp_server = self.params["email"]["smtp"]
 
         server = smtplib.SMTP(smtp_server)
+        #server.starttls()
         server.set_debuglevel(1)
         print(TEXT)
         server.sendmail(FROM, TO, msg.as_string())

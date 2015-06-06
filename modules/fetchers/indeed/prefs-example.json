@@ -16,7 +16,9 @@
         "python", 
         "java", 
         "linux", 
-        "angular"
+        "angular",
+        "Computer+Science",
+        "-stage"
     ],
     "email":{
         "from":"anyemail@example.com",

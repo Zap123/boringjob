@@ -23,6 +23,8 @@
     "email":{
         "from":"anyemail@example.com",
         "to":"myemail@example.com",
-        "smtp":"smtp.gmail.com"
+        "user":"user@example.com",
+        "password":"password",
+        "smtp":"smtp.example.com"
     }
 }

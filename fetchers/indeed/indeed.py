@@ -1,6 +1,7 @@
 import requests
 import json
 import smtplib
+from getpass import getpass
 import time
 from email.mime.message import MIMEMessage
 from email.mime.text import MIMEText
@@ -59,6 +60,8 @@ class IndeedFetcher:
         server = smtplib.SMTP(smtp_server)
         server.ehlo()
         #server.starttls()
-        #server.login(user,password)
+        if self.params["email"]["password"] == "":
+            self.params["email"]["password"] = getpass("Insert SMTP password: ")
+        server.login(self.params["email"]["user"],str(self.params["email"]["password"]))
         server.sendmail(msg['From'], msg['To'], msg.as_string())
         server.quit()

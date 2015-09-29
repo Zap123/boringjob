@@ -1,8 +1,3 @@
-#
-# Indeed: require free Publisher account 
-# http://www.indeed.com/jsp/apiinfo.jsp
-# 
-
 import requests
 import json
 import smtplib
@@ -11,13 +6,17 @@ from email.mime.message import MIMEMessage
 from email.mime.text import MIMEText
 
 class IndeedFetcher:
+    """ Query indeed interface 
+        Indeed: require free Publisher account 
+        http://www.indeed.com/jsp/apiinfo.jsp
+    """
     url = "http://api.indeed.com/ads/apisearch"
-    with open("modules/fetchers/indeed/prefs.json") as prefs:
-        params = json.load(prefs)
-        query = params["query"] 
-    
     def __init__(self):
         self.query["q"] = self.inOR(self.params["keyword"])
+    
+    with open("fetchers/indeed/prefs.json") as prefs:
+        params = json.load(prefs)
+        query = params["query"] 
 
     def inOR(self,keyword):
         ORString = "("
@@ -29,14 +28,12 @@ class IndeedFetcher:
         return ORString + ")"
 
     def get(self):
-        """ Query indeed interface"""
-        print(self.query)
         r = requests.get(self.url, params=self.query)
-        print(r.url)
-        self.sendToMail(self.results(json.loads(r.content.decode('utf-8'))), 
-                "JOB OPPORTUNITIES " + time.strftime("%d/%m/%Y"))
+        text = "JOB OPPORTUNITIES " + time.strftime("%d/%m/%Y")
+        self.sendToMail(self.message(r.content),text)
     
-    def results(self, dict_json):
+    def message(self, content):
+        dict_json = json.loads(content.decode('utf-8'))
         msg = "Hej! Here your latest job opportunities for the last " 
         msg += str(self.query["fromage"]) + " day/s"
         msg += "<ol>"
@@ -50,25 +47,18 @@ class IndeedFetcher:
             msg += "<a href="+ el[u'url'] +">Read more<a>"
             msg += "</li><br>"
         msg += "</ol> <br>"
-        print(msg)
         return msg
     
-    def sendToMail(self,TEXT, SUBJECT):
+    def sendToMail(self, TEXT, SUBJECT):
         msg = MIMEText(TEXT,'html','utf-8')
         msg['Subject'] = SUBJECT
-        FROM = self.params["email"]["from"]
-        msg['From'] = FROM
-        TO = self.params["email"]["to"]
-        msg['To'] = TO
+        msg['From'] = self.params["email"]["from"]
+        msg['To'] = self.params["email"]["to"]
+
         smtp_server = self.params["email"]["smtp"]
-
         server = smtplib.SMTP(smtp_server)
+        server.ehlo()
         #server.starttls()
-        server.set_debuglevel(1)
-        print(TEXT)
-        server.sendmail(FROM, TO, msg.as_string())
+        #server.login(user,password)
+        server.sendmail(msg['From'], msg['To'], msg.as_string())
         server.quit()
-
-
-if __name__ == "__main__":
-    IndeedFetcher().get()
